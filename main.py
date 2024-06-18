@@ -18,7 +18,7 @@ def show_countries():
     countries = sorted(set(ship["COUNTRY"] for ship in ships))
     for country in countries:
         print(country)
-    7
+    
 
 
 def top_countries(num_countries):
@@ -36,25 +36,41 @@ def top_countries(num_countries):
         print(f"{country}: {count}")
 
 
+dispatch = {
+    "help": print_help,
+    "show_countries": show_countries,
+    "top_countries": top_countries,
+    "exit": None,
+}
+
+
 def main():
     """Main function to run the Ships CLI."""
 
     print("Welcome to the Ships CLI! Enter 'help' to view available commands.")
     while True:
-        command = input("py# ").strip().lower()
-        if command == "help":
-            print_help()
-        elif command == "show_countries":
-            show_countries()
-        elif command.startswith("top_countries"):
-            try:
-                num_countries = int(command.split()[1])
-                top_countries(num_countries)
-            except (IndexError, ValueError):
-                print("Error: Please provide a valid number for top_countries.")
-        elif command == "exit":
-            print("Exiting the Ships CLI. Goodbye!")
-            break
+        command_input = input("py# ").strip().lower()
+        if not command_input:
+            continue
+
+        parts = command_input.split()
+        command = parts[0]
+
+        if command in dispatch:
+            if command == "top_countries":
+                if len(parts) == 2:
+                    try:
+                        num_countries = int(parts[1])
+                        dispatch[command](num_countries)
+                    except ValueError:
+                        print("Error: Please provide a valid number for top_countries.")
+                else:
+                    print("Usage: top_countries <num_countries>")
+            elif command == "exit":
+                print("Exiting the Ships CLI. Goodbye!")
+                break
+            else:
+                dispatch[command]()
         else:
             print("Unknown command. Type 'help' to see available commands.")
 
