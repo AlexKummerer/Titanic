@@ -1,18 +1,20 @@
 from load_data import load_data
+from typing import List, Dict, Optional
 
 all_data = load_data()
 ships = all_data["data"]
 
 
-def print_help():
+def print_help() -> None:
     """Prints the help message listing available commands."""
     print("Available commands:")
     print("help")
     print("show_countries")
     print("top_countries <num_countries>")
     print("ships_by_types")
+    print("search_ship <name>")
 
-def ships_by_types():
+def ships_by_types() -> None:
     """Displays the count of ships by their types."""
 
     ship_types_count = {}
@@ -26,6 +28,18 @@ def ships_by_types():
     sorted_ship_types = sorted(ship_types_count.items(), key=lambda x: x[1], reverse=True)
     for ship_type, count in sorted_ship_types:
         print(f"{ship_type}: {count}")   
+
+def search_ship(name:str) -> None :
+    """Search for ships by name (case insensitive and partial match)."""
+    search_term: str = name.lower()
+    found_ships: list[str] = [ship["SHIPNAME"] for ship in ships if search_term in ship["SHIPNAME"].lower()]
+
+    if found_ships:
+        print("Ships found:")
+        for ship_name in found_ships:
+            print(ship_name)
+    else:
+        print("No ships found matching the search term.")
 
 def show_countries():
     """Prints the list of countries without duplicates, ordered alphabetically."""
@@ -55,6 +69,7 @@ dispatch = {
     "show_countries": show_countries,
     "top_countries": top_countries,
     "ships_by_types": ships_by_types,
+    "search_ship": search_ship,
     "exit": None,
 }
 
@@ -81,6 +96,11 @@ def main():
                         print("Error: Please provide a valid number for top_countries.")
                 else:
                     print("Usage: top_countries <num_countries>")
+            elif command == "search_ship":
+                if len(parts) == 2:
+                    dispatch[command](parts[1])
+                else:
+                    print("Usage: search_ship <name>")
             elif command == "exit":
                 print("Exiting the Ships CLI. Goodbye!")
                 break
