@@ -1,4 +1,3 @@
-import sys
 from load_data import load_data
 
 all_data = load_data()
@@ -11,7 +10,22 @@ def print_help():
     print("help")
     print("show_countries")
     print("top_countries <num_countries>")
+    print("ships_by_types")
 
+def ships_by_types():
+    """Displays the count of ships by their types."""
+
+    ship_types_count = {}
+    for ship in ships: 
+        ship_type = ship["TYPE_SUMMARY"]
+        if ship in ship_types_count:
+            ship_types_count[ship_type] += 1
+        else:
+            ship_types_count[ship_type] = 1
+
+    sorted_ship_types = sorted(ship_types_count.items(), key=lambda x: x[1], reverse=True)
+    for ship_type, count in sorted_ship_types:
+        print(f"{ship_type}: {count}")   
 
 def show_countries():
     """Prints the list of countries without duplicates, ordered alphabetically."""
@@ -40,6 +54,7 @@ dispatch = {
     "help": print_help,
     "show_countries": show_countries,
     "top_countries": top_countries,
+    "ships_by_types": ships_by_types,
     "exit": None,
 }
 
