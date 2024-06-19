@@ -1,8 +1,41 @@
 from load_data import load_data
 import matplotlib.pyplot as plt
+import geopandas as gpd
+from geodatasets import get_path
+
 
 all_data: dict[str, list[dict[str, str]]] = load_data()
 ships: list[dict[str, str]] = all_data["data"]
+
+def draw_map():
+    """Draw the ships on a world map using their location data."""
+    lons: list[float] = [float(ship["LON"]) for ship in ships if ship["LON"]]
+    lats: list[float] = [float(ship["LAT"]) for ship in ships if ship["LAT"]]
+    names: list[str] = [ship["SHIPNAME"] for ship in ships]
+
+    world = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
+
+    gdf = gpd.GeoDataFrame(
+        {"Name": names, "Longitude": lons, "Latitude": lats},
+        geometry=gpd.points_from_xy(lons, lats),
+    )
+
+    # Initialize the map plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    world.plot(ax=ax, color='lightgrey')
+    
+
+    # Plot the ship locations
+    gdf.plot(ax=ax, color='red', markersize=50, alpha=0.6, edgecolor='black')    
+    
+    
+    plt.title("Ship Locations on World Map")
+    plt.xlabel("Longitude")
+    plt.ylabel("Latitude")
+
+    # Save the plot to a file
+    plt.savefig("ship_locations_map.png")
+    plt.show()
 
 
 def print_help() -> None:
@@ -14,6 +47,7 @@ def print_help() -> None:
     print("ships_by_types")
     print("search_ship <name>")
     print("speed_histogram")
+    print("draw_map")
 
 
 def speed_histogram() -> None:
@@ -92,6 +126,7 @@ dispatch = {
     "ships_by_types": ships_by_types,
     "search_ship": search_ship,
     "speed_histogram": speed_histogram,
+    "draw_map": draw_map,
     "exit": None,
 }
 
